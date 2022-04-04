@@ -42,6 +42,8 @@ func main() {
 	product := r.Group("/api/product")
 	{
 		product.GET("/list", api.ProductionList)
+		product.GET("/banner", api.Banner)
+		product.GET("/listByCategory", api.ProductionListByCategory)
 		//product.GET("/info/:id", ProductHandler.ProductInfoHandler)
 		//product.POST("/add", ProductHandler.AddProductHandler)
 		//product.POST("/edit", ProductHandler.EditProductHandler)

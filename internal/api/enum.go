@@ -1,5 +1,7 @@
 package api
 
+import "math"
+
 type (
 	PayType      int
 	ResponseType int
@@ -10,6 +12,33 @@ type (
 const (
 	OperateOk   ResponseType = 200
 	OperateFail ResponseType = 500
+)
+
+const (
+	AllCategory = iota
+	VegetableSoybean
+	MeatPoultryEggMilk
+	SeafoodAquaculture
+	Fruit
+	FrozenFood
+)
+
+const (
+	AllPrice = iota
+	ZeroToFifty
+	FiftyToHundred
+	HundredToDouble
+	BiggerThanTwoHundred
+)
+
+var (
+	PriceMap = map[int][2]int{
+		AllPrice:             {0, math.MaxInt},
+		ZeroToFifty:          {0, 50},
+		FiftyToHundred:       {51, 100},
+		HundredToDouble:      {101, 200},
+		BiggerThanTwoHundred: {200, math.MaxInt},
+	}
 )
 
 func (p ResponseType) String() string {

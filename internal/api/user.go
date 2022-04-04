@@ -21,7 +21,7 @@ func UserLogin(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
 		return
 	}
-	isExisted, err := client.IsExisted(user.UserId)
+	isExisted, err := client.IsExisted(user)
 	if err != nil {
 		entity.Msg = OperateFail.String()
 		entity.Data = err
@@ -37,7 +37,7 @@ func UserLogin(c *gin.Context) {
 	if err := mysql.DB.Where(mysql.User{
 		UserId:   user.UserId,
 		Password: user.Password,
-	}).First(&user1); err != nil {
+	}).First(&user1).Error; err != nil {
 		entity.Msg = OperateFail.String()
 		entity.Data = err
 		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
@@ -45,9 +45,10 @@ func UserLogin(c *gin.Context) {
 	}
 	if user1.UserId != "" {
 		entity = Entity{
-			Code: http.StatusOK,
-			Msg:  OperateOk.String(),
-			Data: "Login successfully",
+			Code:    http.StatusOK,
+			Success: true,
+			Msg:     OperateOk.String(),
+			Data:    "Login successfully",
 		}
 		c.JSON(http.StatusOK, gin.H{"entity": entity})
 	}
@@ -66,7 +67,7 @@ func UserRegister(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
 		return
 	}
-	isExisted, err := client.IsExisted(user.UserId)
+	isExisted, err := client.IsExisted(user)
 	if err != nil {
 		entity.Msg = OperateFail.String()
 		entity.Data = err
@@ -85,7 +86,10 @@ func UserRegister(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
 		return
 	} else {
+		entity.Code = int(OperateOk)
 		entity.Msg = OperateOk.String()
+		entity.Success = true
+		entity.Data = "Register successful"
 		c.JSON(http.StatusOK, gin.H{"entity": entity})
 	}
 }

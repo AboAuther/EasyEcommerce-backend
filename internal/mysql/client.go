@@ -2,6 +2,7 @@ package mysql
 
 import (
 	"EasyEcommerce-backend/internal/utils"
+	"errors"
 	"strings"
 	"time"
 
@@ -12,7 +13,7 @@ import (
 
 var DB *gorm.DB
 
-func MysqlDSNFromENV(prefix string, params ...string) string {
+func mysqlDSNFromENV(prefix string, params ...string) string {
 	dsn := utils.MustGetenv("DSN")
 	if len(params) > 0 {
 		dsn = dsn + "?" + strings.Join(params, "&")
@@ -22,7 +23,7 @@ func MysqlDSNFromENV(prefix string, params ...string) string {
 
 func InitDB() error {
 	var err error
-	dsn := MysqlDSNFromENV("", "parseTime=true")
+	dsn := mysqlDSNFromENV("", "parseTime=true")
 	DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Error),
 	})
@@ -39,5 +40,15 @@ func InitDB() error {
 
 		sqlDB.SetConnMaxLifetime(time.Hour)
 		return nil
+	}
+}
+
+func IsMissing(tx *gorm.DB) bool {
+	if errors.Is(tx.Error, gorm.ErrRecordNotFound) {
+		return true
+	} else if tx.Error == nil {
+		return false
+	} else {
+		panic(tx.Error)
 	}
 }
