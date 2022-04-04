@@ -4,6 +4,7 @@ import (
 	"EasyEcommerce-backend/internal/client"
 	"EasyEcommerce-backend/internal/mysql"
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"net/http"
@@ -118,13 +119,61 @@ func Banner(c *gin.Context) {
 	}
 }
 
-func ProductDetail(c *gin.Context) {
-	//entity := Entity{
-	//	Code:      int(OperateFail),
-	//	Msg:       OperateFail.String(),
-	//	Total:     0,
-	//	TotalPage: 1,
-	//	Data:      nil,
-	//}
-
+func ProductByID(c *gin.Context) {
+	entity := Entity{
+		Code:      int(OperateFail),
+		Msg:       OperateFail.String(),
+		Total:     0,
+		TotalPage: 1,
+		Data:      nil,
+	}
+	var product mysql.Product
+	id := c.Param("id")
+	if err := mysql.DB.Where(mysql.Product{ProductId: id}).Find(&product).Error; err != nil {
+		entity.Data = err
+		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
+		return
+	}
+	if product.ProductId != "" {
+		entity = Entity{
+			Code:      http.StatusOK,
+			Msg:       OperateOk.String(),
+			Success:   true,
+			Total:     1,
+			TotalPage: 1,
+			Data:      product,
+		}
+		c.JSON(http.StatusOK, gin.H{"entity": entity})
+		return
+	}
+}
+func ProductByName(c *gin.Context) {
+	entity := Entity{
+		Code:      int(OperateFail),
+		Msg:       OperateFail.String(),
+		Total:     0,
+		TotalPage: 1,
+		Data:      nil,
+	}
+	var product mysql.Product
+	name := c.Param("name")
+	name = fmt.Sprintf("%s%s%s", "%", name, "%")
+	if err := mysql.DB.Where("product_name LIKE ?", name).Find(&product).Error; err != nil {
+		entity.Data = err
+		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
+		return
+	}
+	fmt.Println(product)
+	if product.ProductId != "" {
+		entity = Entity{
+			Code:      http.StatusOK,
+			Msg:       OperateOk.String(),
+			Success:   true,
+			Total:     1,
+			TotalPage: 1,
+			Data:      product,
+		}
+		c.JSON(http.StatusOK, gin.H{"entity": entity})
+		return
+	}
 }

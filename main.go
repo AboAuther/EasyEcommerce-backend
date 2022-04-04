@@ -44,6 +44,8 @@ func main() {
 		product.GET("/list", api.ProductionList)
 		product.GET("/banner", api.Banner)
 		product.GET("/listByCategory", api.ProductionListByCategory)
+		product.GET("id/:id", api.ProductByID)
+		product.GET("name/:name", api.ProductByName)
 		//product.GET("/info/:id", ProductHandler.ProductInfoHandler)
 		//product.POST("/add", ProductHandler.AddProductHandler)
 		//product.POST("/edit", ProductHandler.EditProductHandler)
@@ -52,7 +54,7 @@ func main() {
 	user := r.Group("/api/user")
 	{
 		user.POST("/login", api.UserLogin)
-		user.POST("register", api.UserRegister)
+		user.POST("/register", api.UserRegister)
 		//user.GET("/list", UserHandler.UserListHandler)
 		//user.GET("/info/:id", UserHandler.UserInfoHandler)
 		//user.POST("/add", UserHandler.AddUserHandler)

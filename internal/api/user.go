@@ -8,7 +8,7 @@ import (
 )
 
 func UserLogin(c *gin.Context) {
-
+	//session := sessions.Default(c)
 	entity := Entity{
 		Code: int(OperateFail),
 		Msg:  OperateFail.String(),
@@ -21,7 +21,7 @@ func UserLogin(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
 		return
 	}
-	isExisted, err := client.IsExisted(user)
+	isExisted, err := client.IsExisted(user.UserId)
 	if err != nil {
 		entity.Msg = OperateFail.String()
 		entity.Data = err
@@ -67,7 +67,7 @@ func UserRegister(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
 		return
 	}
-	isExisted, err := client.IsExisted(user)
+	isExisted, err := client.IsExisted(user.UserId)
 	if err != nil {
 		entity.Msg = OperateFail.String()
 		entity.Data = err
