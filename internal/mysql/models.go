@@ -46,23 +46,23 @@ type Banner struct {
 }
 
 type Order struct {
-	OrderId     string    `json:"orderId" gorm:"column:order_id"`
-	UserId      string    `json:"userId" gorm:"column:user_id"`
-	Mobile      string    `json:"mobile" gorm:"column:mobile"`
-	Price       int64     `json:"totalPrice" gorm:"column:price"`
-	PayStatus   int       `json:"payStatus" gorm:"column:pay_status"`
-	PayType     int       `json:"payType" gorm:"column:pay_type"`
-	PayTime     string    `json:"payTime" gorm:"column:pay_time"`
-	OrderStatus int       `json:"orderStatus" gorm:"column:order_status"`
-	ExtraInfo   string    `json:"extraInfo" gorm:"column:extra_info"`
-	UserAddress string    `json:"userAddress" gorm:"column:user_address"`
-	IsDeleted   bool      `json:"isDeleted" gorm:"column:is_deleted"`
-	CreatedAt   time.Time `json:"createAt" gorm:"column:created_at"`
-	UpdatedAt   time.Time `json:"updateAt" gorm:"column:updated_at"`
+	gorm.Model
+	OrderId      string  `json:"orderId" gorm:"column:order_id"`
+	UserId       string  `json:"userId" gorm:"column:user_id"`
+	ProductId    string  `json:"productId" gorm:"column:product_id"`
+	Name         string  `json:"name" gorm:"column:name"`
+	Description  string  `json:"description" gorm:"column:description"`
+	Mobile       string  `json:"mobile" gorm:"column:mobile"`
+	TotalPrice   float64 `json:"totalPrice" gorm:"column:total_price"`
+	ProductPrice float64 `json:"productPrice" gorm:"column:product_price"`
+	ProductNum   int     `json:"productNum" gorm:"column:product_num"`
+	PayStatus    string  `json:"payStatus" gorm:"column:pay_status"`
+	OrderStatus  string  `json:"orderStatus" gorm:"column:order_status"`
+	UserAddress  string  `json:"userAddress" gorm:"column:user_address"`
 }
 
 type User struct {
-	UserId    string    `json:"username" gorm:"column:user_id"`
+	UserId    string    `json:"userID" gorm:"column:user_id"`
 	NickName  string    `json:"nickName" gorm:"column:nick_name"`
 	Mobile    string    `json:"mobile" gorm:"column:mobile"`
 	Password  string    `json:"password" gorm:"column:password"`
@@ -86,4 +86,34 @@ type ShoppingAddress struct {
 	Address    string `json:"address" gorm:"column:address"`
 	Mobile     string `json:"mobile" gorm:"column:mobile"`
 	Default    bool   `json:"default" gorm:"column:default"`
+}
+type ProductEvaluation struct {
+	gorm.Model
+	CreateUser   string `json:"createUser" gorm:"column:create_user"`
+	ProductId    string `json:"productId" gorm:"column:product_id"`
+	ProductName  string `json:"productName" gorm:"column:product_name"`
+	ProductNum   int    `json:"productNum" gorm:"column:product_num"`
+	ProductIntro string `json:"productIntro" gorm:"column:product_intro"`
+	Evaluation   string `json:"evaluation" gorm:"column:evaluation"`
+	Star         int    `json:"star" gorm:"column:star"`
+}
+
+type CombineProductAndEvaluation struct {
+	Product     Product             `json:"product"`
+	Evaluations []ProductEvaluation `json:"evaluation"`
+}
+
+type CombineProductsAndAddress struct {
+	Products []Product `json:"products"`
+	Data     Order     `json:"data"`
+}
+
+type ShoppingCart struct {
+	gorm.Model
+	UserId          string  `json:"userId" gorm:"column:user_id"`
+	ProductId       string  `json:"productId" gorm:"column:product_id"`
+	ProductCoverImg string  `json:"productCoverImg" gorm:"column:product_cover_img"`
+	Description     string  `json:"description" gorm:"column:description"`
+	ProductPrice    float64 `json:"productPrice" gorm:"column:product_price"`
+	ProductNum      int     `json:"productNum" gorm:"column:product_num"`
 }

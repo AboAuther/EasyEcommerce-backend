@@ -128,24 +128,39 @@ func ProductByID(c *gin.Context) {
 		Data:      nil,
 	}
 	var product mysql.Product
+	var evaluations, tmp []mysql.ProductEvaluation
+
 	id := c.Param("id")
 	if err := mysql.DB.Where(mysql.Product{ProductId: id}).Find(&product).Error; err != nil {
 		entity.Data = err
 		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
 		return
 	}
-	if product.ProductId != "" {
-		entity = Entity{
-			Code:      http.StatusOK,
-			Msg:       OperateOk.String(),
-			Success:   true,
-			Total:     1,
-			TotalPage: 1,
-			Data:      product,
-		}
-		c.JSON(http.StatusOK, gin.H{"entity": entity})
+	if err := mysql.DB.Where(mysql.ProductEvaluation{ProductId: id}).Find(&evaluations).Error; err != nil {
+		entity.Data = err
+		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
 		return
 	}
+	var combine mysql.CombineProductAndEvaluation
+	if product.ProductId != "" {
+		combine.Product = product
+	}
+	for _, evaluation := range evaluations {
+		if evaluation.ProductId != "" && evaluation.Evaluation != "" {
+			tmp = append(tmp, evaluation)
+		}
+	}
+	combine.Evaluations = tmp
+	entity = Entity{
+		Code:      http.StatusOK,
+		Msg:       OperateOk.String(),
+		Success:   true,
+		Total:     1,
+		TotalPage: 1,
+		Data:      combine,
+	}
+	c.JSON(http.StatusOK, gin.H{"entity": entity})
+	return
 }
 func ProductByName(c *gin.Context) {
 	entity := Entity{
@@ -155,7 +170,7 @@ func ProductByName(c *gin.Context) {
 		TotalPage: 1,
 		Data:      nil,
 	}
-	var product mysql.Product
+	var product []mysql.Product
 	name := c.Param("name")
 	name = fmt.Sprintf("%s%s%s", "%", name, "%")
 	if err := mysql.DB.Where("product_name LIKE ?", name).Find(&product).Error; err != nil {
@@ -163,17 +178,15 @@ func ProductByName(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
 		return
 	}
-	fmt.Println(product)
-	if product.ProductId != "" {
-		entity = Entity{
-			Code:      http.StatusOK,
-			Msg:       OperateOk.String(),
-			Success:   true,
-			Total:     1,
-			TotalPage: 1,
-			Data:      product,
-		}
-		c.JSON(http.StatusOK, gin.H{"entity": entity})
-		return
+	entity = Entity{
+		Code:      http.StatusOK,
+		Msg:       OperateOk.String(),
+		Success:   true,
+		Total:     len(product),
+		TotalPage: 1,
+		Data:      product,
 	}
+	c.JSON(http.StatusOK, gin.H{"entity": entity})
+	return
+
 }

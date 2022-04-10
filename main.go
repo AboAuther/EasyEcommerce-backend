@@ -4,6 +4,8 @@ import (
 	"EasyEcommerce-backend/internal/api"
 	"EasyEcommerce-backend/internal/mysql"
 	"EasyEcommerce-backend/internal/utils"
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 	logger "github.com/sirupsen/logrus"
 	"net/http"
@@ -37,6 +39,8 @@ func main() {
 	}
 
 	r := gin.Default()
+	store := cookie.NewStore([]byte("secret"))
+	r.Use(sessions.Sessions("session_id", store))
 	r.Use(Cors())
 
 	product := r.Group("/api/product")
@@ -55,11 +59,22 @@ func main() {
 	{
 		user.POST("/login", api.UserLogin)
 		user.POST("/register", api.UserRegister)
+		user.POST("/edit", api.UserEdit)
 		//user.GET("/list", UserHandler.UserListHandler)
 		//user.GET("/info/:id", UserHandler.UserInfoHandler)
 		//user.POST("/add", UserHandler.AddUserHandler)
 		//user.POST("/edit", UserHandler.EditUserHandler)
 		//user.POST("/delete/:id", UserHandler.DeleteUserHandler)
+	}
+	order := r.Group("/api/order")
+	{
+		order.GET("/list", api.GetOrder)
+		order.POST("/create", api.MakeOrders)
+		order.POST("/addCart", api.AddCart)
+		order.POST("/edit", api.EditCart)
+		order.POST("/delete", api.DeleteCart)
+		//order.POST("/edit", OrderHandler.EditOrderHandler)
+		//order.POST("/delete/:id", OrderHandler.DeleteOrderHandler)
 	}
 	//banner := r.Group("/api/banner")
 	//{
@@ -78,15 +93,6 @@ func main() {
 	//	category.POST("/add", CategoryHandler.AddCategoryHandler)
 	//	category.POST("/edit", CategoryHandler.EditCategoryHandler)
 	//	category.POST("/delete/:id", CategoryHandler.DeleteCategoryHandler)
-	//}
-
-	//order := r.Group("/api/order")
-	//{
-	//	order.GET("/list", OrderHandler.OrderListHandler)
-	//	order.GET("/info/:id", OrderHandler.OrderInfoHandler)
-	//	order.POST("/add", OrderHandler.AddOrderHandler)
-	//	order.POST("/edit", OrderHandler.EditOrderHandler)
-	//	order.POST("/delete/:id", OrderHandler.DeleteOrderHandler)
 	//}
 
 	port := utils.GetStringEnv("PORT", ":8080")
