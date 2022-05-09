@@ -76,9 +76,12 @@ func main() {
 		//order.POST("/edit", OrderHandler.EditOrderHandler)
 		//order.POST("/delete/:id", OrderHandler.DeleteOrderHandler)
 	}
-	notice := r.Group("/api/notice")
+	notice := r.Group("/api/message")
 	{
-		notice.GET("/", api.GetNotice)
+		notice.GET("/notice", api.GetNotice)
+		notice.GET("/board", api.GetMessageBoard)
+		notice.POST("/addMessage", api.AddMessage)
+		notice.POST("/verifyMessage", api.VerifyMessage)
 	}
 
 	port := utils.GetStringEnv("PORT", ":8080")

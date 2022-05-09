@@ -123,3 +123,12 @@ type Notice struct {
 	Title   string
 	Content string
 }
+
+type MessageBoard struct {
+	gorm.Model
+	UserID   string
+	Nickname string
+	Topic    string
+	Content  string
+	IsVerify bool
+}

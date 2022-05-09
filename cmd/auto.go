@@ -5,8 +5,8 @@ import (
 )
 
 func main() {
-	adddress := new(mysql.Notice)
+	adddress := new(mysql.MessageBoard)
 	mysql.InitDB()
 	mysql.DB.AutoMigrate(adddress)
-	
+
 }
