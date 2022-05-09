@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/rand"
 	"fmt"
+	logger "github.com/sirupsen/logrus"
 	"math/big"
 )
 
@@ -15,7 +16,7 @@ func CreateRandomNumber() string {
 	for i := 1; i <= 12; i++ {
 		random, err := rand.Int(rand.Reader, big.NewInt(int64(length)))
 		if err != nil {
-
+			logger.Panic(err)
 		}
 		container += fmt.Sprintf("%d", numbers[random.Int64()])
 	}

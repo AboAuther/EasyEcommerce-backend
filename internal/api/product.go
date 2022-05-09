@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
+	"math"
 	"net/http"
 	"strconv"
 )
@@ -60,9 +61,17 @@ func ProductionListByCategory(c *gin.Context) {
 	case AllCategory:
 		model = new(mysql.Product)
 	}
+	if category > 5 {
+		model.CategoryId = 0
+	}
 	priceStr := c.Query("price")
 	price, _ := strconv.Atoi(priceStr)
-	priceRange := PriceMap[price]
+	priceRange := [2]int{}
+	if pR, ok := PriceMap[price]; !ok {
+		priceRange = [2]int{0, math.MaxInt}
+	} else {
+		priceRange = pR
+	}
 	err := mysql.DB.Where(model).Where("selling_price between ? and ?", priceRange[0], priceRange[1]).Order("click_num desc").Find(&productionLists).Error
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		entity.Data = err
