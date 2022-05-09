@@ -76,24 +76,10 @@ func main() {
 		//order.POST("/edit", OrderHandler.EditOrderHandler)
 		//order.POST("/delete/:id", OrderHandler.DeleteOrderHandler)
 	}
-	//banner := r.Group("/api/banner")
-	//{
-	//	banner.GET("/list", BannerHandler.BannerListHandler)
-	//	banner.GET("/info/:id", BannerHandler.BannerInfoHandler)
-	//	banner.POST("/add", BannerHandler.AddBannerHandler)
-	//	banner.POST("/edit", BannerHandler.EditBannerHandler)
-	//	banner.POST("/delete/:id", BannerHandler.DeleteBannerHandler)
-	//}
-	//
-	//category := r.Group("/api/category")
-	//{
-	//	category.GET("/list", CategoryHandler.CategoryListHandler)
-	//	category.GET("/list4backend", CategoryHandler.CategoryList4BackendHandler)
-	//	category.GET("/info/:id", CategoryHandler.CategoryInfoHandler)
-	//	category.POST("/add", CategoryHandler.AddCategoryHandler)
-	//	category.POST("/edit", CategoryHandler.EditCategoryHandler)
-	//	category.POST("/delete/:id", CategoryHandler.DeleteCategoryHandler)
-	//}
+	notice := r.Group("/api/notice")
+	{
+		notice.GET("/", api.GetNotice)
+	}
 
 	port := utils.GetStringEnv("PORT", ":8080")
 	if err := r.Run(port); err != nil {

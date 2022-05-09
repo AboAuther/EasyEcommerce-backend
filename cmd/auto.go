@@ -2,14 +2,11 @@ package main
 
 import (
 	"EasyEcommerce-backend/internal/mysql"
-	"EasyEcommerce-backend/internal/utils"
-	"fmt"
 )
 
 func main() {
-	adddress := new(mysql.Order)
+	adddress := new(mysql.Notice)
 	mysql.InitDB()
 	mysql.DB.AutoMigrate(adddress)
-	fmt.Println(utils.CreateRandomNumber())
-
+	
 }

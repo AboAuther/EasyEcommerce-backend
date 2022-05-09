@@ -117,3 +117,9 @@ type ShoppingCart struct {
 	ProductPrice    float64 `json:"productPrice" gorm:"column:product_price"`
 	ProductNum      int     `json:"productNum" gorm:"column:product_num"`
 }
+
+type Notice struct {
+	gorm.Model
+	Title   string
+	Content string
+}

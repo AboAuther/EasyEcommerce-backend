@@ -9,6 +9,24 @@ type (
 	PayStatus    int
 )
 
+var (
+	failedEntity = Entity{
+		Code:      int(OperateFail),
+		Msg:       OperateFail.String(),
+		Total:     0,
+		TotalPage: 1,
+		Data:      nil,
+	}
+	successEntity = Entity{
+		Code:      int(OperateOk),
+		Msg:       OperateOk.String(),
+		Success:   true,
+		Total:     0,
+		TotalPage: 1,
+		Data:      nil,
+	}
+)
+
 const (
 	OperateOk   ResponseType = 200
 	OperateFail ResponseType = 500
