@@ -28,8 +28,9 @@ var (
 )
 
 const (
-	OperateOk   ResponseType = 200
-	OperateFail ResponseType = 500
+	OperateOk     ResponseType = 200
+	OperateFail   ResponseType = 500
+	OperateUnauth ResponseType = 400
 )
 
 const (

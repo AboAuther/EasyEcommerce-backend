@@ -52,8 +52,8 @@ func UserLogin(c *gin.Context) {
 			Msg:     OperateOk.String(),
 			Data:    "Login successfully",
 		}
-		session.Set(user1.UserId, user1.UserId)
-		_ = session.Save()
+		session.Set("status", true)
+		session.Save()
 		c.JSON(http.StatusOK, gin.H{"entity": entity})
 	}
 }

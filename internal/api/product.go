@@ -6,6 +6,7 @@ import (
 	"EasyEcommerce-backend/internal/mysql/models"
 	"errors"
 	"fmt"
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"math"
@@ -136,6 +137,13 @@ func ProductByID(c *gin.Context) {
 		Total:     0,
 		TotalPage: 1,
 		Data:      nil,
+	}
+	session := sessions.Default(c)
+	status := session.Get("status")
+	if status != true {
+		entity.Data = "请先登录"
+		c.JSON(http.StatusBadRequest, gin.H{"entity": entity})
+		return
 	}
 	var product models.Product
 	var evaluations, tmp []models.ProductEvaluation
