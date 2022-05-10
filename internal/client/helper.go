@@ -1,10 +1,13 @@
 package client
 
-import "EasyEcommerce-backend/internal/mysql"
+import (
+	"EasyEcommerce-backend/internal/mysql"
+	"EasyEcommerce-backend/internal/mysql/models"
+)
 
 func IsExisted(userId string) (bool, error) {
-	var user mysql.User
-	if mysql.IsMissing(mysql.DB.Where(mysql.User{UserId: userId}).First(&user)) {
+	var user models.User
+	if mysql.IsMissing(mysql.DB.Where(models.User{UserId: userId}).First(&user)) {
 		return false, nil
 	}
 	if user.UserId != "" {

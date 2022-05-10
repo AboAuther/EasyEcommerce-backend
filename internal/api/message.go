@@ -2,13 +2,14 @@ package api
 
 import (
 	"EasyEcommerce-backend/internal/mysql"
+	"EasyEcommerce-backend/internal/mysql/models"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
 func GetNotice(c *gin.Context) {
 	entity := failedEntity
-	var notices []mysql.Notice
+	var notices []models.Notice
 	if err := mysql.DB.Order("id desc").Limit(3).Find(&notices).Error; err != nil {
 		entity.Data = err
 		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
@@ -22,7 +23,7 @@ func GetNotice(c *gin.Context) {
 }
 func GetMessageBoard(c *gin.Context) {
 	entity := failedEntity
-	var messages []mysql.MessageBoard
+	var messages []models.MessageBoard
 	isVerify := c.Query("is_verify")
 	if err := mysql.DB.Where("is_verify = ?", isVerify).Order("id desc").Find(&messages).Error; err != nil {
 		entity.Data = err
@@ -38,7 +39,7 @@ func GetMessageBoard(c *gin.Context) {
 
 func AddMessage(c *gin.Context) {
 	entity := failedEntity
-	var message mysql.MessageBoard
+	var message models.MessageBoard
 	if err := c.ShouldBindJSON(&message); err != nil {
 		entity.Data = err
 		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
@@ -58,7 +59,7 @@ func AddMessage(c *gin.Context) {
 
 func VerifyMessage(c *gin.Context) {
 	entity := failedEntity
-	var message []*mysql.MessageBoard
+	var message []*models.MessageBoard
 	if err := c.ShouldBindJSON(&message); err != nil {
 		entity.Data = err
 		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})

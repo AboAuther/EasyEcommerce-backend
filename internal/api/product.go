@@ -3,6 +3,7 @@ package api
 import (
 	"EasyEcommerce-backend/internal/client"
 	"EasyEcommerce-backend/internal/mysql"
+	"EasyEcommerce-backend/internal/mysql/models"
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -13,7 +14,7 @@ import (
 )
 
 func ProductionList(c *gin.Context) {
-	var productionLists []mysql.Product
+	var productionLists []models.Product
 	entity := Entity{
 		Code:      int(OperateFail),
 		Msg:       OperateFail.String(),
@@ -45,7 +46,7 @@ func ProductionList(c *gin.Context) {
 }
 
 func ProductionListByCategory(c *gin.Context) {
-	var productionLists []mysql.Product
+	var productionLists []models.Product
 	entity := Entity{
 		Code:      int(OperateFail),
 		Msg:       OperateFail.String(),
@@ -53,13 +54,13 @@ func ProductionListByCategory(c *gin.Context) {
 		TotalPage: 1,
 		Data:      nil,
 	}
-	model := new(mysql.Product)
+	model := new(models.Product)
 	categoryStr := c.Query("category")
 	category, _ := strconv.Atoi(categoryStr)
 	model.CategoryId = category
 	switch category {
 	case AllCategory:
-		model = new(mysql.Product)
+		model = new(models.Product)
 	}
 	if category > 5 {
 		model.CategoryId = 0
@@ -104,7 +105,7 @@ func Banner(c *gin.Context) {
 		TotalPage: 1,
 		Data:      nil,
 	}
-	var banner []*mysql.Banner
+	var banner []*models.Banner
 	if err := mysql.DB.Order("updated_at desc").Find(&banner).Limit(4).Error; err != nil {
 		entity.Data = err
 		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
@@ -136,21 +137,21 @@ func ProductByID(c *gin.Context) {
 		TotalPage: 1,
 		Data:      nil,
 	}
-	var product mysql.Product
-	var evaluations, tmp []mysql.ProductEvaluation
+	var product models.Product
+	var evaluations, tmp []models.ProductEvaluation
 
 	id := c.Param("id")
-	if err := mysql.DB.Where(mysql.Product{ProductId: id}).Find(&product).Error; err != nil {
+	if err := mysql.DB.Where(models.Product{ProductId: id}).Find(&product).Error; err != nil {
 		entity.Data = err
 		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
 		return
 	}
-	if err := mysql.DB.Where(mysql.ProductEvaluation{ProductId: id}).Find(&evaluations).Error; err != nil {
+	if err := mysql.DB.Where(models.ProductEvaluation{ProductId: id}).Find(&evaluations).Error; err != nil {
 		entity.Data = err
 		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
 		return
 	}
-	var combine mysql.CombineProductAndEvaluation
+	var combine models.CombineProductAndEvaluation
 	if product.ProductId != "" {
 		combine.Product = product
 	}
@@ -179,7 +180,7 @@ func ProductByName(c *gin.Context) {
 		TotalPage: 1,
 		Data:      nil,
 	}
-	var product []mysql.Product
+	var product []models.Product
 	name := c.Param("name")
 	name = fmt.Sprintf("%s%s%s", "%", name, "%")
 	if err := mysql.DB.Where("product_name LIKE ?", name).Find(&product).Error; err != nil {

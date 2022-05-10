@@ -3,6 +3,7 @@ package api
 import (
 	"EasyEcommerce-backend/internal/client"
 	"EasyEcommerce-backend/internal/mysql"
+	"EasyEcommerce-backend/internal/mysql/models"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -15,7 +16,7 @@ func UserLogin(c *gin.Context) {
 		Msg:  OperateFail.String(),
 		Data: "Wrong username or password",
 	}
-	var user, user1 mysql.User
+	var user, user1 models.User
 	if err := c.ShouldBindJSON(&user); err != nil {
 		entity.Msg = OperateFail.String()
 		entity.Data = err
@@ -35,7 +36,7 @@ func UserLogin(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
 		return
 	}
-	if err := mysql.DB.Where(mysql.User{
+	if err := mysql.DB.Where(models.User{
 		UserId:   user.UserId,
 		Password: user.Password,
 	}).First(&user1).Error; err != nil {
@@ -63,7 +64,7 @@ func UserRegister(c *gin.Context) {
 		Msg:   OperateFail.String(),
 		Total: 0,
 	}
-	var user mysql.User
+	var user models.User
 	if err := c.ShouldBindJSON(&user); err != nil {
 		entity.Msg = OperateFail.String()
 		entity.Data = err
@@ -96,13 +97,14 @@ func UserRegister(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"entity": entity})
 	}
 }
+
 func UserEdit(c *gin.Context) {
 	entity := Entity{
 		Code:  int(OperateFail),
 		Msg:   OperateFail.String(),
 		Total: 0,
 	}
-	var user mysql.User
+	var user models.User
 	if err := c.ShouldBindJSON(&user); err != nil {
 		entity.Msg = OperateFail.String()
 		entity.Data = err

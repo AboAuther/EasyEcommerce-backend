@@ -68,11 +68,13 @@ func main() {
 	}
 	order := r.Group("/api/order")
 	{
-		order.GET("/list", api.GetOrder)
-		order.POST("/create", api.MakeOrders)
+		order.GET("/getOrder", api.GetOrder)
+		order.POST("/makeOrder", api.MakeOrders)
 		order.POST("/addCart", api.AddCart)
-		order.POST("/edit", api.EditCart)
-		order.POST("/delete", api.DeleteCart)
+		order.POST("/editCart", api.EditCart)
+		order.POST("/deleteCart", api.DeleteCart)
+		order.POST("/addEvaluation", api.AddEvaluation)
+		order.POST("/deleteOrder", api.DeleteOrder)
 		//order.POST("/edit", OrderHandler.EditOrderHandler)
 		//order.POST("/delete/:id", OrderHandler.DeleteOrderHandler)
 	}
