@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	adddress := new(models.ProductEvaluation)
+	adddress := new(models.ShoppingAddress)
 	mysql.InitDB()
 	mysql.DB.AutoMigrate(adddress)
 

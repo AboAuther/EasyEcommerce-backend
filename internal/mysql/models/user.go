@@ -1,6 +1,9 @@
 package models
 
-import "time"
+import (
+	"gorm.io/gorm"
+	"time"
+)
 
 type User struct {
 	UserId    string    `json:"userID" gorm:"column:user_id"`
@@ -17,4 +20,14 @@ type User struct {
 
 func (User) TableName() string {
 	return "users"
+}
+
+type ShoppingAddress struct {
+	gorm.Model
+	CreateUser string `json:"createUser" gorm:"column:create_user"`
+	Name       string `json:"name" gorm:"column:name"`
+	Region     string `json:"region" gorm:"column:region"`
+	Detail     string `json:"detail" gorm:"column:detail"`
+	Mobile     string `json:"mobile" gorm:"column:mobile"`
+	Default    bool   `json:"default" gorm:"column:default"`
 }

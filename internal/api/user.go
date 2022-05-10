@@ -53,7 +53,13 @@ func UserLogin(c *gin.Context) {
 			Data:    "Login successfully",
 		}
 		session.Set("status", true)
-		session.Save()
+		err := session.Save()
+		if err != nil {
+			entity.Msg = OperateFail.String()
+			entity.Data = err
+			c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
+			return
+		}
 		c.JSON(http.StatusOK, gin.H{"entity": entity})
 	}
 }
@@ -136,4 +142,64 @@ func UserEdit(c *gin.Context) {
 		entity.Data = "Edit successfully"
 		c.JSON(http.StatusOK, gin.H{"entity": entity})
 	}
+}
+
+func GetAddress(c *gin.Context) {
+	entity := failedEntity
+	id := c.Query("userID")
+	var addresses []models.ShoppingAddress
+	if err := mysql.DB.Where("create_user = ?", id).Order("id desc").Find(&addresses).Error; err != nil {
+		entity.Data = err.Error()
+		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
+		return
+	}
+	entity = successEntity
+	entity.Data = addresses
+	c.JSON(http.StatusOK, gin.H{"entity": entity})
+	return
+}
+
+func AddAddress(c *gin.Context) {
+	entity := failedEntity
+	var address models.ShoppingAddress
+	if err := c.ShouldBindJSON(&address); err != nil {
+		entity.Data = err.Error()
+		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
+		return
+	}
+	if address.CreateUser != "" {
+		if address.Default {
+			if err := mysql.DB.Model(models.ShoppingAddress{}).Where("create_user=?", address.CreateUser).Update("default", false).Error; err != nil {
+				entity.Data = err.Error()
+				c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
+				return
+			}
+		}
+		if err := mysql.DB.Save(&address).Error; err != nil {
+			entity.Data = err.Error()
+			c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
+			return
+		}
+		entity = successEntity
+		entity.Data = "Add successfully"
+		c.JSON(http.StatusOK, gin.H{"entity": entity})
+		return
+	}
+	entity.Data = "Invalid data"
+	c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
+	return
+}
+
+func DeleteAddress(c *gin.Context) {
+	entity := failedEntity
+	id := c.Param("id")
+	if err := mysql.DB.Where("id=?", id).Delete(&models.ShoppingAddress{}).Error; err != nil {
+		entity.Data = err.Error()
+		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
+		return
+	}
+	entity = successEntity
+	entity.Data = "Deleted successfully"
+	c.JSON(http.StatusOK, gin.H{"entity": entity})
+	return
 }

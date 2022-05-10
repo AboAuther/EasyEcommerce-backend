@@ -39,9 +39,9 @@ func main() {
 	}
 
 	r := gin.Default()
+	r.Use(Cors())
 	store := cookie.NewStore([]byte("secret"))
 	r.Use(sessions.Sessions("session_id", store))
-	r.Use(Cors())
 
 	product := r.Group("/api/product")
 	{
@@ -60,9 +60,9 @@ func main() {
 		user.POST("/login", api.UserLogin)
 		user.POST("/register", api.UserRegister)
 		user.POST("/edit", api.UserEdit)
-		//user.GET("/list", UserHandler.UserListHandler)
-		//user.GET("/info/:id", UserHandler.UserInfoHandler)
-		//user.POST("/add", UserHandler.AddUserHandler)
+		user.GET("/getAddress", api.GetAddress)
+		user.POST("/addAddress", api.AddAddress)
+		user.POST("/deleteAddress/:id", api.DeleteAddress)
 		//user.POST("/edit", UserHandler.EditUserHandler)
 		//user.POST("/delete/:id", UserHandler.DeleteUserHandler)
 	}

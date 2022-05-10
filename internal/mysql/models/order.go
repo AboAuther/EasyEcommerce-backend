@@ -37,16 +37,6 @@ type Order struct {
 	UserAddress      string  `json:"userAddress" gorm:"column:user_address"`
 }
 
-type ShoppingAddress struct {
-	gorm.Model
-	CreateUser string `json:"createUser" gorm:"column:create_user"`
-	Name       string `json:"name" gorm:"column:name"`
-	Region     string `json:"region" gorm:"column:region"`
-	Address    string `json:"address" gorm:"column:address"`
-	Mobile     string `json:"mobile" gorm:"column:mobile"`
-	Default    bool   `json:"default" gorm:"column:default"`
-}
-
 type ShoppingCart struct {
 	gorm.Model
 	UserId          string  `json:"userId" gorm:"column:user_id"`
