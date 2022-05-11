@@ -13,7 +13,7 @@ func GetOrder(c *gin.Context) {
 	entity := failedEntity
 	id := c.Query("userID")
 	var orders []models.Order
-	if err := mysql.DB.Where(models.Order{UserId: id}).Find(&orders).Error; err != nil {
+	if err := mysql.DB.Where("user_id = ?", id).Find(&orders).Error; err != nil {
 		entity.Data = err.Error()
 		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
 		return

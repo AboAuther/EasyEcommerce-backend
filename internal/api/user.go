@@ -7,6 +7,7 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"time"
 )
 
 func UserLogin(c *gin.Context) {
@@ -50,9 +51,9 @@ func UserLogin(c *gin.Context) {
 			Code:    http.StatusOK,
 			Success: true,
 			Msg:     OperateOk.String(),
-			Data:    "Login successfully",
+			Data:    user1.UserId,
 		}
-		session.Set("status", true)
+		session.Set("status", "login")
 		err := session.Save()
 		if err != nil {
 			entity.Msg = OperateFail.String()
@@ -175,6 +176,8 @@ func AddAddress(c *gin.Context) {
 				return
 			}
 		}
+		address.CreatedAt = time.Now()
+		address.UpdatedAt = time.Now()
 		if err := mysql.DB.Save(&address).Error; err != nil {
 			entity.Data = err.Error()
 			c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})

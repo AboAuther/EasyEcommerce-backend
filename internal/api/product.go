@@ -137,13 +137,7 @@ func ProductByID(c *gin.Context) {
 		TotalPage: 1,
 		Data:      nil,
 	}
-	//session := sessions.Default(c)
-	//status := session.Get("status")
-	//if status != true {
-	//	entity.Data = "请先登录"
-	//	c.JSON(http.StatusBadRequest, gin.H{"entity": entity})
-	//	return
-	//}
+
 	var product models.Product
 	var evaluations, tmp []models.ProductEvaluation
 
