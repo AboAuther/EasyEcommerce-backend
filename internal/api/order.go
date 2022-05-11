@@ -78,16 +78,32 @@ func DeleteOrder(c *gin.Context) {
 	return
 }
 
+func GetCart(c *gin.Context) {
+	entity := failedEntity
+	var shoppingCarts []models.ShoppingCart
+	userID := c.Query("userID")
+	if err := mysql.DB.Where("user_id=?", userID).Find(&shoppingCarts).Error; err != nil {
+		entity.Data = err.Error()
+		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
+		return
+	}
+	entity = successEntity
+	entity.Total = len(shoppingCarts)
+	entity.Data = shoppingCarts
+	c.JSON(http.StatusOK, gin.H{"entity": entity})
+	return
+}
+
 func AddCart(c *gin.Context) {
 	entity := failedEntity
 	var shoppingCart models.ShoppingCart
 	if err := c.ShouldBindJSON(&shoppingCart); err != nil {
-		entity.Data = err.Error
+		entity.Data = err.Error()
 		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
 		return
 	}
 	if err := mysql.DB.Save(&shoppingCart).Error; err != nil {
-		entity.Data = err.Error
+		entity.Data = err.Error()
 		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
 		return
 	}
@@ -101,19 +117,19 @@ func EditCart(c *gin.Context) {
 	entity := failedEntity
 	var shoppingCart models.ShoppingCart
 	if err := c.ShouldBindJSON(&shoppingCart); err != nil {
-		entity.Data = err.Error
+		entity.Data = err.Error()
 		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
 		return
 	}
 	if shoppingCart.ProductNum > 0 {
-		if err := mysql.DB.UpdateColumn("product_num", shoppingCart.ProductNum).Error; err != nil {
-			entity.Data = err.Error
+		if err := mysql.DB.Model(models.ShoppingCart{}).Where(models.ShoppingCart{Model: gorm.Model{ID: shoppingCart.ID}}).Update("product_num", shoppingCart.ProductNum).Error; err != nil {
+			entity.Data = err.Error()
 			c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
 			return
 		}
 	} else {
-		if err := mysql.DB.Where(models.ShoppingCart{UserId: shoppingCart.UserId, ProductId: shoppingCart.ProductId}).Delete(models.ShoppingCart{}).Error; err != nil {
-			entity.Data = err.Error
+		if err := mysql.DB.Where(models.ShoppingCart{Model: gorm.Model{ID: shoppingCart.ID}}).Delete(&models.ShoppingCart{}).Error; err != nil {
+			entity.Data = err.Error()
 			c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
 			return
 		}
@@ -129,16 +145,21 @@ func DeleteCart(c *gin.Context) {
 	entity := failedEntity
 	var shoppingCart []models.ShoppingCart
 	if err := c.ShouldBindJSON(&shoppingCart); err != nil {
-		entity.Data = err.Error
+		entity.Data = err.Error()
 		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
 		return
 	}
-	for _, cart := range shoppingCart {
-		if err := mysql.DB.Where(models.ShoppingCart{UserId: cart.UserId, ProductId: cart.ProductId}).Delete(models.ShoppingCart{}).Error; err != nil {
-			entity.Data = err.Error
-			c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
-			return
+	if err := mysql.DB.Transaction(func(tx *gorm.DB) error {
+		for _, cart := range shoppingCart {
+			if err := mysql.DB.Where(models.ShoppingCart{Model: gorm.Model{ID: cart.ID}}).Delete(&models.ShoppingCart{}).Error; err != nil {
+				return err
+			}
 		}
+		return nil
+	}); err != nil {
+		entity.Data = err.Error()
+		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
+		return
 	}
 	entity = successEntity
 	entity.Data = "Deleted successfully"
@@ -150,7 +171,7 @@ func AddEvaluation(c *gin.Context) {
 	entity := failedEntity
 	var evaluation models.ProductEvaluation
 	if err := c.ShouldBindJSON(&evaluation); err != nil {
-		entity.Data = err.Error
+		entity.Data = err.Error()
 		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
 		return
 	}

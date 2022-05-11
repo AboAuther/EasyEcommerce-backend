@@ -56,6 +56,24 @@ func AddMessage(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"entity": entity})
 	return
 }
+func AddNotice(c *gin.Context) {
+	entity := failedEntity
+	var notice models.Notice
+	if err := c.ShouldBindJSON(&notice); err != nil {
+		entity.Data = err
+		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
+		return
+	}
+	if err := mysql.DB.Save(&notice).Error; err != nil {
+		entity.Data = err
+		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
+		return
+	}
+	entity = successEntity
+	entity.Data = "Add notice successfully"
+	c.JSON(http.StatusOK, gin.H{"entity": entity})
+	return
+}
 
 func VerifyMessage(c *gin.Context) {
 	entity := failedEntity

@@ -71,6 +71,7 @@ func main() {
 	{
 		order.GET("/getOrder", api.GetOrder)
 		order.POST("/makeOrder", api.MakeOrders)
+		order.GET("/getCart", api.GetCart)
 		order.POST("/addCart", api.AddCart)
 		order.POST("/editCart", api.EditCart)
 		order.POST("/deleteCart", api.DeleteCart)
@@ -84,6 +85,7 @@ func main() {
 		notice.GET("/notice", api.GetNotice)
 		notice.GET("/board", api.GetMessageBoard)
 		notice.POST("/addMessage", api.AddMessage)
+		notice.POST("/addNotice", api.AddNotice)
 		notice.POST("/verifyMessage", api.VerifyMessage)
 	}
 
