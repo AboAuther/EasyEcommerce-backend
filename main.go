@@ -42,6 +42,7 @@ func main() {
 	r.Use(Cors())
 	store := cookie.NewStore([]byte("secret"))
 	r.Use(sessions.Sessions("session_id", store))
+	r.StaticFS("/images", http.Dir("./images"))
 
 	user := r.Group("/api/user")
 	{
@@ -51,16 +52,25 @@ func main() {
 		user.GET("/getAddress", api.GetAddress)
 		user.POST("/addAddress", api.AddAddress)
 		user.POST("/deleteAddress/:id", api.DeleteAddress)
-		//user.POST("/edit", UserHandler.EditUserHandler)
+
 		//user.POST("/delete/:id", UserHandler.DeleteUserHandler)
+	}
+	seller := r.Group("/api/seller")
+	{
+		seller.POST("/upload", api.UploadImage)
+		seller.POST("/register", api.RegisterSeller)
+		seller.POST("/addProduct", api.AddProduct)
+		seller.POST("/editProduct", api.AddProduct)
+		seller.GET("/getOrders", api.GetOrderForSeller)
+		seller.GET("/getProduct", api.GetProducts)
 	}
 	product := r.Group("/api/product")
 	{
 		product.GET("/list", api.ProductionList)
 		product.GET("/banner", api.Banner)
-		product.GET("/listByCategory", ensureLogin(), api.ProductionListByCategory)
-		product.GET("id/:id", ensureLogin(), api.ProductByID)
-		product.GET("name/:name", ensureLogin(), api.ProductByName)
+		product.GET("/listByCategory", api.ProductionListByCategory)
+		product.GET("id/:id", api.ProductByID)
+		product.GET("name/:name", api.ProductByName)
 		//product.GET("/info/:id", ProductHandler.ProductInfoHandler)
 		//product.POST("/add", ProductHandler.AddProductHandler)
 		//product.POST("/edit", ProductHandler.EditProductHandler)
@@ -92,15 +102,5 @@ func main() {
 	port := utils.GetStringEnv("PORT", ":8080")
 	if err := r.Run(port); err != nil {
 		panic("run failed!")
-	}
-}
-func ensureLogin() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		session := sessions.Default(c)
-		statusInterface := session.Get("status")
-		status := statusInterface.(string)
-		if status != "login" {
-			c.AbortWithStatus(http.StatusUnauthorized)
-		}
 	}
 }

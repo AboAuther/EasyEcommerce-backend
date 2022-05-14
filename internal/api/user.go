@@ -12,57 +12,74 @@ import (
 
 func UserLogin(c *gin.Context) {
 	session := sessions.Default(c)
-	entity := Entity{
-		Code: int(OperateFail),
-		Msg:  OperateFail.String(),
-		Data: "Wrong username or password",
-	}
+	entity := failedEntity
 	var user, user1 models.User
+	var seller models.Seller
 	if err := c.ShouldBindJSON(&user); err != nil {
-		entity.Msg = OperateFail.String()
-		entity.Data = err
+		entity.Data = err.Error()
 		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
 		return
 	}
 	isExisted, err := client.IsExisted(user.UserId)
 	if err != nil {
-		entity.Msg = OperateFail.String()
-		entity.Data = err
+		entity.Data = err.Error()
 		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
 		return
 	}
 	if !isExisted {
-		entity.Msg = OperateFail.String()
 		entity.Data = "The user does not exist"
 		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
 		return
 	}
-	if err := mysql.DB.Where(models.User{
-		UserId:   user.UserId,
-		Password: user.Password,
-	}).First(&user1).Error; err != nil {
-		entity.Msg = OperateFail.String()
-		entity.Data = err
-		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
-		return
+	isSellerStr := c.Query("is_seller")
+	var isSeller bool
+	if isSellerStr == "true" || isSellerStr == "1" {
+		isSeller = true
 	}
-	if user1.UserId != "" {
-		entity = Entity{
-			Code:    http.StatusOK,
-			Success: true,
-			Msg:     OperateOk.String(),
-			Data:    user1.UserId,
-		}
-		session.Set("status", "login")
-		err := session.Save()
-		if err != nil {
-			entity.Msg = OperateFail.String()
-			entity.Data = err
+	if !isSeller {
+		if err := mysql.DB.Where(models.User{
+			UserId:   user.UserId,
+			Password: user.Password,
+		}).First(&user1).Error; err != nil {
+			entity.Data = err.Error()
 			c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
 			return
 		}
-		c.JSON(http.StatusOK, gin.H{"entity": entity})
+		if user1.UserId != "" {
+			entity = successEntity
+			entity.Data = user1.UserId
+			session.Set("status", "Authorized")
+			err := session.Save()
+			if err != nil {
+				entity.Msg = OperateFail.String()
+				entity.Data = err
+				c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
+				return
+			}
+			c.JSON(http.StatusOK, gin.H{"entity": entity})
+		}
+	} else {
+		isMiss := mysql.IsMissing(mysql.DB.Where(models.Seller{UserId: user.UserId, IsVerify: true}).First(&seller))
+		if !isMiss && seller.UserId != "" {
+			if err := mysql.DB.Where(models.User{
+				UserId:   user.UserId,
+				Password: user.Password,
+			}).First(&user1).Error; err != nil {
+				entity.Data = err.Error()
+				c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
+				return
+			}
+			if user1.UserId != "" {
+				entity = successEntity
+				c.JSON(http.StatusOK, gin.H{"entity": entity})
+				return
+			}
+		}
+		entity.Data = "不是商家，或认证未通过"
+		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
+		return
 	}
+
 }
 
 func UserRegister(c *gin.Context) {

@@ -130,14 +130,13 @@ func Banner(c *gin.Context) {
 }
 
 func ProductByID(c *gin.Context) {
-	entity := Entity{
-		Code:      int(OperateFail),
-		Msg:       OperateFail.String(),
-		Total:     0,
-		TotalPage: 1,
-		Data:      nil,
+	entity := failedEntity
+	if !client.EnsureLogin(c) {
+		entity.Code = http.StatusUnauthorized
+		entity.Data = "请登录后查看"
+		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
+		return
 	}
-
 	var product models.Product
 	var evaluations, tmp []models.ProductEvaluation
 
@@ -162,14 +161,8 @@ func ProductByID(c *gin.Context) {
 		}
 	}
 	combine.Evaluations = tmp
-	entity = Entity{
-		Code:      http.StatusOK,
-		Msg:       OperateOk.String(),
-		Success:   true,
-		Total:     1,
-		TotalPage: 1,
-		Data:      combine,
-	}
+	entity = successEntity
+	entity.Data = combine
 	c.JSON(http.StatusOK, gin.H{"entity": entity})
 	return
 }

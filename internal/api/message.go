@@ -24,7 +24,11 @@ func GetNotice(c *gin.Context) {
 func GetMessageBoard(c *gin.Context) {
 	entity := failedEntity
 	var messages []models.MessageBoard
-	isVerify := c.Query("is_verify")
+	isVerifyStr := c.Query("is_verify")
+	isVerify := false
+	if isVerifyStr == "true" || isVerifyStr == "1" {
+		isVerify = true
+	}
 	if err := mysql.DB.Where("is_verify = ?", isVerify).Order("id desc").Find(&messages).Error; err != nil {
 		entity.Data = err
 		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
