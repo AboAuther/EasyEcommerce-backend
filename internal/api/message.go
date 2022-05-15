@@ -78,25 +78,3 @@ func AddNotice(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"entity": entity})
 	return
 }
-
-func VerifyMessage(c *gin.Context) {
-	entity := failedEntity
-	var message []*models.MessageBoard
-	if err := c.ShouldBindJSON(&message); err != nil {
-		entity.Data = err
-		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
-		return
-	}
-	for _, board := range message {
-		board.IsVerify = true
-	}
-	if err := mysql.DB.Save(message).Error; err != nil {
-		entity.Data = err
-		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
-		return
-	}
-	entity = successEntity
-	entity.Data = "Verify successfully"
-	c.JSON(http.StatusOK, gin.H{"entity": entity})
-	return
-}

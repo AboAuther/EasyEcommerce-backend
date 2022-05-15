@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	adddress := new(models.Seller)
+	adddress := new(models.User)
 	mysql.InitDB()
 	mysql.DB.AutoMigrate(adddress)
 	//os.Mkdir("./images", 0777)

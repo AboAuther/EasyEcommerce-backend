@@ -52,17 +52,17 @@ func main() {
 		user.GET("/getAddress", api.GetAddress)
 		user.POST("/addAddress", api.AddAddress)
 		user.POST("/deleteAddress/:id", api.DeleteAddress)
-
-		//user.POST("/delete/:id", UserHandler.DeleteUserHandler)
+		user.GET("/getMessage", api.GetUser)
 	}
 	seller := r.Group("/api/seller")
 	{
 		seller.POST("/upload", api.UploadImage)
 		seller.POST("/register", api.RegisterSeller)
 		seller.POST("/addProduct", api.AddProduct)
-		seller.POST("/editProduct", api.AddProduct)
+		seller.POST("/editProduct", api.EditProduct)
 		seller.GET("/getOrders", api.GetOrderForSeller)
 		seller.GET("/getProduct", api.GetProducts)
+		seller.GET("/getMessage", api.GetMessage)
 	}
 	product := r.Group("/api/product")
 	{
@@ -71,10 +71,6 @@ func main() {
 		product.GET("/listByCategory", api.ProductionListByCategory)
 		product.GET("id/:id", api.ProductByID)
 		product.GET("name/:name", api.ProductByName)
-		//product.GET("/info/:id", ProductHandler.ProductInfoHandler)
-		//product.POST("/add", ProductHandler.AddProductHandler)
-		//product.POST("/edit", ProductHandler.EditProductHandler)
-		//product.POST("/delete/:id", ProductHandler.DeleteProductHandler)
 	}
 
 	order := r.Group("/api/order")
@@ -96,9 +92,13 @@ func main() {
 		notice.GET("/board", api.GetMessageBoard)
 		notice.POST("/addMessage", api.AddMessage)
 		notice.POST("/addNotice", api.AddNotice)
-		notice.POST("/verifyMessage", api.VerifyMessage)
 	}
-
+	admin := r.Group("/api/admin")
+	{
+		admin.POST("/verifyMessage", api.VerifyMessage)
+		admin.POST("/verifySeller", api.VerifySeller)
+		admin.GET("/getSeller", api.GetSellerForVerify)
+	}
 	port := utils.GetStringEnv("PORT", ":8080")
 	if err := r.Run(port); err != nil {
 		panic("run failed!")

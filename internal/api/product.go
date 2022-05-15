@@ -178,7 +178,7 @@ func ProductByName(c *gin.Context) {
 	name := c.Param("name")
 	name = fmt.Sprintf("%s%s%s", "%", name, "%")
 	if err := mysql.DB.Where("product_name LIKE ?", name).Find(&product).Error; err != nil {
-		entity.Data = err
+		entity.Data = err.Error()
 		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
 		return
 	}

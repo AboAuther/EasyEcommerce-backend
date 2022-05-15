@@ -6,6 +6,7 @@ import (
 	"EasyEcommerce-backend/internal/mysql/models"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 	"net/http"
 	"time"
 )
@@ -220,6 +221,27 @@ func DeleteAddress(c *gin.Context) {
 	}
 	entity = successEntity
 	entity.Data = "Deleted successfully"
+	c.JSON(http.StatusOK, gin.H{"entity": entity})
+	return
+}
+
+func GetUser(c *gin.Context) {
+	entity := failedEntity
+	var user models.User
+	userID := c.Query("userID")
+	if err := mysql.DB.Transaction(func(tx *gorm.DB) error {
+		if err := mysql.DB.Where("user_id=?", userID).Find(&user).Error; err != nil {
+			return err
+		}
+		return nil
+	}); err != nil {
+		entity.Data = err.Error()
+		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
+		return
+	}
+	user.Password = ""
+	entity = successEntity
+	entity.Data = user
 	c.JSON(http.StatusOK, gin.H{"entity": entity})
 	return
 }

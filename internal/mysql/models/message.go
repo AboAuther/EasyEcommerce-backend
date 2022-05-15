@@ -4,8 +4,8 @@ import "gorm.io/gorm"
 
 type Notice struct {
 	gorm.Model
-	Title   string
-	Content string
+	Title   string `json:"title"`
+	Content string `json:"content"`
 }
 
 type MessageBoard struct {
