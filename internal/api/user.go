@@ -123,46 +123,6 @@ func UserRegister(c *gin.Context) {
 	}
 }
 
-func UserEdit(c *gin.Context) {
-	entity := Entity{
-		Code:  int(OperateFail),
-		Msg:   OperateFail.String(),
-		Total: 0,
-	}
-	var user models.User
-	if err := c.ShouldBindJSON(&user); err != nil {
-		entity.Msg = OperateFail.String()
-		entity.Data = err
-		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
-		return
-	}
-	isExisted, err := client.IsExisted(user.UserId)
-	if err != nil {
-		entity.Msg = OperateFail.String()
-		entity.Data = err
-		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
-		return
-	}
-	if isExisted {
-		entity.Msg = OperateFail.String()
-		entity.Data = "The user is already existed"
-		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
-		return
-	}
-	if mysql.DB.Save(&user).Error != nil {
-		entity.Msg = OperateFail.String()
-		entity.Data = err.Error() + "can not save user data"
-		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
-		return
-	} else {
-		entity.Code = int(OperateOk)
-		entity.Msg = OperateOk.String()
-		entity.Success = true
-		entity.Data = "Edit successfully"
-		c.JSON(http.StatusOK, gin.H{"entity": entity})
-	}
-}
-
 func GetAddress(c *gin.Context) {
 	entity := failedEntity
 	id := c.Query("userID")
@@ -242,6 +202,38 @@ func GetUser(c *gin.Context) {
 	user.Password = ""
 	entity = successEntity
 	entity.Data = user
+	c.JSON(http.StatusOK, gin.H{"entity": entity})
+	return
+}
+
+func EditUser(c *gin.Context) {
+	entity := failedEntity
+	var user models.User
+	if err := c.ShouldBindJSON(&user); err != nil {
+		entity.Data = err.Error()
+		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
+		return
+	}
+	isExisted, err := client.IsExisted(user.UserId)
+	if err != nil {
+		entity.Msg = OperateFail.String()
+		entity.Data = err
+		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
+		return
+	}
+	if !isExisted {
+		entity.Msg = OperateFail.String()
+		entity.Data = "The user is not existed"
+		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
+		return
+	}
+	if err := mysql.DB.Model(&user).Select("nickname", "mobile", "information").UpdateColumns(&user).Error; err != nil {
+		entity.Data = err.Error()
+		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
+		return
+	}
+	entity = successEntity
+	entity.Data = "update successfully"
 	c.JSON(http.StatusOK, gin.H{"entity": entity})
 	return
 }

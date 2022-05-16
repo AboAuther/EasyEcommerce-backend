@@ -48,7 +48,7 @@ func main() {
 	{
 		user.POST("/login", api.UserLogin)
 		user.POST("/register", api.UserRegister)
-		user.POST("/edit", api.UserEdit)
+		user.POST("/edit", api.EditUser)
 		user.GET("/getAddress", api.GetAddress)
 		user.POST("/addAddress", api.AddAddress)
 		user.POST("/deleteAddress/:id", api.DeleteAddress)
@@ -83,8 +83,6 @@ func main() {
 		order.POST("/deleteCart", api.DeleteCart)
 		order.POST("/addEvaluation", api.AddEvaluation)
 		order.POST("/deleteOrder", api.DeleteOrder)
-		//order.POST("/edit", OrderHandler.EditOrderHandler)
-		//order.POST("/delete/:id", OrderHandler.DeleteOrderHandler)
 	}
 	notice := r.Group("/api/message")
 	{

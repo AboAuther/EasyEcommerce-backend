@@ -7,9 +7,9 @@ import (
 
 type User struct {
 	UserId      string         `json:"userID" gorm:"primaryKey"`
-	NickName    string         `json:"nickName" gorm:"column:nick_name"`
-	Mobile      string         `json:"mobile" gorm:"column:mobile"`
 	Password    string         `json:"password" gorm:"column:password"`
+	NickName    string         `json:"nickName" gorm:"column:nickname"`
+	Mobile      string         `json:"mobile" gorm:"column:mobile"`
 	Region      string         `json:"region" gorm:"column:region"`
 	Address     string         `json:"address" gorm:"column:address"`
 	Information string         `json:"information" gorm:"column:information"`
