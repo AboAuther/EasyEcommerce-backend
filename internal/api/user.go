@@ -14,14 +14,15 @@ import (
 func UserLogin(c *gin.Context) {
 	session := sessions.Default(c)
 	entity := failedEntity
-	var user, user1 models.User
+	var user UserVerify
+	var user1 models.User
 	var seller models.Seller
 	if err := c.ShouldBindJSON(&user); err != nil {
 		entity.Data = err.Error()
 		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
 		return
 	}
-	isExisted, err := client.IsExisted(user.UserId)
+	isExisted, err := client.IsExisted(user.UserID)
 	if err != nil {
 		entity.Data = err.Error()
 		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
@@ -32,14 +33,9 @@ func UserLogin(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
 		return
 	}
-	isSellerStr := c.Query("is_seller")
-	var isSeller bool
-	if isSellerStr == "true" || isSellerStr == "1" {
-		isSeller = true
-	}
-	if !isSeller {
+	if !user.IsSeller {
 		if err := mysql.DB.Where(models.User{
-			UserId:   user.UserId,
+			UserId:   user.UserID,
 			Password: user.Password,
 		}).First(&user1).Error; err != nil {
 			entity.Data = err.Error()
@@ -60,10 +56,10 @@ func UserLogin(c *gin.Context) {
 			c.JSON(http.StatusOK, gin.H{"entity": entity})
 		}
 	} else {
-		isMiss := mysql.IsMissing(mysql.DB.Where(models.Seller{UserId: user.UserId, IsVerify: true}).First(&seller))
+		isMiss := mysql.IsMissing(mysql.DB.Where(models.Seller{UserId: user.UserID, IsVerify: true}).First(&seller))
 		if !isMiss && seller.UserId != "" {
 			if err := mysql.DB.Where(models.User{
-				UserId:   user.UserId,
+				UserId:   user.UserID,
 				Password: user.Password,
 			}).First(&user1).Error; err != nil {
 				entity.Data = err.Error()
@@ -72,6 +68,7 @@ func UserLogin(c *gin.Context) {
 			}
 			if user1.UserId != "" {
 				entity = successEntity
+				entity.Data = user1.UserId
 				c.JSON(http.StatusOK, gin.H{"entity": entity})
 				return
 			}

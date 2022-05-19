@@ -1,6 +1,7 @@
 package api
 
 import (
+	"EasyEcommerce-backend/internal/client"
 	"EasyEcommerce-backend/internal/mysql"
 	"EasyEcommerce-backend/internal/mysql/models"
 	"EasyEcommerce-backend/internal/utils"
@@ -52,6 +53,11 @@ func MakeOrders(c *gin.Context) {
 			EvaluationStatus: false,
 		}
 		orders = append(orders, order)
+		if err := client.MakeSaleData(order.ProductId, order.TotalPrice); err != nil {
+			entity.Data = err.Error()
+			c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
+			return
+		}
 	}
 	if err := mysql.DB.Save(&orders).Error; err != nil {
 		entity.Data = err.Error()
@@ -102,11 +108,21 @@ func AddCart(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
 		return
 	}
-	if err := mysql.DB.Save(&shoppingCart).Error; err != nil {
-		entity.Data = err.Error()
-		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
-		return
+	if isMiss := mysql.IsMissing(mysql.DB.Where(&models.ShoppingCart{UserId: shoppingCart.UserId, ProductId: shoppingCart.ProductId}).First(&shoppingCart)); isMiss {
+		if err := mysql.DB.Save(&shoppingCart).Error; err != nil {
+			entity.Data = err.Error()
+			c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
+			return
+		}
+	} else {
+		shoppingCart.ProductNum++
+		if err := mysql.DB.Save(&shoppingCart).Error; err != nil {
+			entity.Data = err.Error()
+			c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
+			return
+		}
 	}
+
 	entity = successEntity
 	entity.Data = "Add successfully"
 	c.JSON(http.StatusOK, gin.H{"entity": entity})

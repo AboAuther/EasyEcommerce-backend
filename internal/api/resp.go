@@ -16,3 +16,28 @@ type SellerAggregation struct {
 	TotalPrice     float64 `json:"totalPrice"`
 	YesterdayPrice float64 `json:"yesterDayPrice"`
 }
+
+type UserVerify struct {
+	UserID   string `json:"userID"`
+	Password string `json:"password"`
+	IsSeller bool   `json:"is_seller"`
+}
+
+type SaleData struct {
+	models.SaleData
+	Time string `json:"time"`
+	Date string `json:"date"`
+}
+type SaleDataAggregation struct {
+	TotalPrice      float64    `json:"totalPrice"`
+	YesterdayPrice  float64    `json:"yesterdayPrice"`
+	TotalOrders     int64      `json:"totalOrders"`
+	YesterdayOrders int64      `json:"yesterdayOrders"`
+	TotalUsers      int64      `json:"totalUsers"`
+	YesterdayUsers  int64      `json:"yesterdayUsers"`
+	SaleNum         int        `json:"saleNum"`
+	SaleOutNum      int        `json:"saleOutNum"`
+	AllOrders       int64      `json:"allOrders"`
+	RejectOrders    int64      `json:"rejectOrders"`
+	SaleDatas       []SaleData `json:"saleDatas"`
+}

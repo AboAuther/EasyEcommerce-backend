@@ -1,11 +1,13 @@
 package utils
 
 import (
+	"EasyEcommerce-backend/internal/mysql/models"
 	"bytes"
 	"crypto/rand"
 	"fmt"
 	logger "github.com/sirupsen/logrus"
 	"math/big"
+	"sort"
 )
 
 func CreateRandomNumber() string {
@@ -36,4 +38,18 @@ func CreateRandomString() string {
 		container += fmt.Sprintf("%d", numbers[random.Int64()])
 	}
 	return container
+}
+
+func SortCreateTime(data []models.SaleData) []models.SaleData {
+	sort.Slice(data, func(i, j int) bool {
+		return data[i].CreatedAt.After(data[j].CreatedAt)
+	})
+	return data
+}
+
+func SortCreateTimeASC(data []models.SaleData) []models.SaleData {
+	sort.Slice(data, func(i, j int) bool {
+		return data[i].CreatedAt.Before(data[j].CreatedAt)
+	})
+	return data
 }

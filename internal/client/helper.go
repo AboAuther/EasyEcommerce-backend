@@ -5,6 +5,8 @@ import (
 	"EasyEcommerce-backend/internal/mysql/models"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
+	"time"
 )
 
 func IsExisted(userId string) (bool, error) {
@@ -36,4 +38,28 @@ func EnsureLogin(c *gin.Context) bool {
 		}
 	}
 	return false
+}
+func MakeSaleData(product string, price float64) error {
+	var saledata models.SaleData
+	var user string
+	tomorrow := time.Now().AddDate(0, 0, 1)
+	zeroTimeTomorrow := time.Date(tomorrow.Year(), tomorrow.Month(), tomorrow.Day(),
+		0, 0, 0, 0, tomorrow.Location())
+	if err := mysql.DB.Model(&models.Product{}).Select("create_user").Where("product_id =?", product).Scan(&user).Error; err != nil {
+		return err
+	}
+
+	isMiss := mysql.IsMissing(mysql.DB.Where("user_id = ?", user).Where("created_at =?", zeroTimeTomorrow).First(&saledata))
+	if isMiss {
+		if err := mysql.DB.Save(&models.SaleData{UserID: user, Amount: price, Model: gorm.Model{CreatedAt: zeroTimeTomorrow}}).Error; err != nil {
+			return err
+		}
+	} else {
+		saledata.Amount += price
+		saledata.CreatedAt = zeroTimeTomorrow
+		if err := mysql.DB.Save(&saledata).Error; err != nil {
+			return err
+		}
+	}
+	return nil
 }

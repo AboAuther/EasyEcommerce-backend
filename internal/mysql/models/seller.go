@@ -1,6 +1,9 @@
 package models
 
-import "time"
+import (
+	"gorm.io/gorm"
+	"time"
+)
 
 type Seller struct {
 	UserId          string    `json:"userID" gorm:"column:user_id" gorm:"primaryKey"`
@@ -11,4 +14,10 @@ type Seller struct {
 	ShopName        string    `json:"shopName" gorm:"shop_name"`
 	CreatedAt       time.Time `json:"createdAt" gorm:"created_at"`
 	IsVerify        bool
+}
+
+type SaleData struct {
+	gorm.Model
+	UserID string  `json:"userID"`
+	Amount float64 `json:"amount"`
 }
