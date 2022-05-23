@@ -64,6 +64,7 @@ func main() {
 		seller.GET("/getProduct", api.GetProducts)
 		seller.GET("/getMessage", api.GetMessage)
 		seller.GET("/getSaleMessage", api.GetSaleMessage)
+		seller.POST("/edit", api.EditMessage)
 	}
 	product := r.Group("/api/product")
 	{

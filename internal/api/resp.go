@@ -41,3 +41,9 @@ type SaleDataAggregation struct {
 	RejectOrders    int64      `json:"rejectOrders"`
 	SaleDatas       []SaleData `json:"saleDatas"`
 }
+
+type SellerMessage struct {
+	UserID     string `json:"userID"`
+	LicenseUrl string `json:"licenseUrl" gorm:"license_url"`
+	HygieneUrl string `json:"hygieneUrl" gorm:"hygiene_url"` //卫生许可
+}

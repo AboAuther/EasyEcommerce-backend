@@ -347,3 +347,23 @@ func GetSaleMessage(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"entity": entity})
 	return
 }
+
+func EditMessage(c *gin.Context) {
+	entity := failedEntity
+	var sellerData SellerMessage
+	if err := c.ShouldBindJSON(&sellerData); err != nil {
+		entity.Data = err.Error()
+		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
+		return
+	}
+
+	if err := mysql.DB.Model(&models.Seller{}).Where("user_id= ?", sellerData.UserID).Updates(models.Seller{HygieneUrl: sellerData.HygieneUrl, LicenseUrl: sellerData.LicenseUrl}).Error; err != nil {
+		entity.Data = err.Error()
+		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
+		return
+	}
+	entity = successEntity
+	entity.Data = "Update successfully"
+	c.JSON(http.StatusOK, gin.H{"entity": entity})
+	return
+}

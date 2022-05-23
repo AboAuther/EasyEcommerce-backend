@@ -74,5 +74,4 @@ func VerifyMessage(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"entity": entity})
 		return
 	}
-
 }
